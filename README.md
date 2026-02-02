@@ -1,1 +1,1 @@
-Python Tkinter을 기반으로 한 간단한 계산기 구현
+Python CustomTkinter을 기반으로 한 간단한 계산기 구현
