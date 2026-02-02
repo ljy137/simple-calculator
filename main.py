@@ -6,6 +6,7 @@ import math
 ctk.set_appearance_mode("System")
 ctk.set_default_color_theme("blue")
 
+# 버튼 생성 함수
 def create_btn(text, cmd, row, col, colspan=1, color=None):
     btn = ctk.CTkButton(
         root,
@@ -17,7 +18,8 @@ def create_btn(text, cmd, row, col, colspan=1, color=None):
         hover_color="#3B3B3B" if not color else None
     )
 
-    btn.grid(row=row, 
+    btn.grid(
+        row=row, 
         column=col, 
         columnspan=colspan, 
         sticky="nsew", 
@@ -27,6 +29,7 @@ def create_btn(text, cmd, row, col, colspan=1, color=None):
 
     return btn
 
+# 버튼 클릭 이벤트 함수
 def button_click(c):
     operators = ["+", "-", "x", "÷", "^"]
     errors = [
@@ -53,18 +56,19 @@ def button_click(c):
 
     input_display.xview_moveto(1.0)
 
+# 입력된 값을 전부 삭제하는 함수
 def button_all_delete():
     output_display.configure(text="")
     input_display.delete(0, "end")
 
+# 입력된 값에서 한 칸 삭제하는 함수
 def button_delete():
     output_display.configure(text="")
     cursor_pos = input_display.index("insert")
     if cursor_pos > 0:
         input_display.delete(cursor_pos - 1, cursor_pos)
 
-    input_display.xview_moveto(1.0)
-
+# 연산 결과를 출력하는 함수
 def button_result():
     try:
         expr = input_display.get()
@@ -73,9 +77,9 @@ def button_result():
         expr = expr.replace('^', '**')
         
         tmp = eval(expr)
-        result = f"{tmp:.2f}"
+        result = f"{tmp:.4f}"
 
-        if result.endswith(".00"):
+        if result.endswith(".0000"):
             result = int(tmp)
 
         output_display.configure(text=str(result))
@@ -89,22 +93,24 @@ def button_result():
     except Exception:
         output_display.configure(text="Error: 잘못된 수식")
 
+# 창의 크기에 따라 글자 크기를 최적화하는 함수
 def resize_fonts(event):
     if event.widget == root:
         diagonal = math.sqrt(event.width**2 + event.width**2)
 
         actual_btn_h = int(btn_ac.winfo_height())
-        new_size = max(18, min(int(actual_btn_h*0.8), int(diagonal/28))) 
+        new_size = max(20, min(int(actual_btn_h*0.8), int(diagonal/25))) 
 
         new_input_h = int(event.height * 0.12)
         new_output_h = int(event.height * 0.08)
 
         input_display.configure(font=("Arial", new_size), height=new_input_h)
-        output_display.configure(font=("Arial", new_size), height=new_output_h)
+        output_display.configure(font=("Arial", new_size*1.5), height=new_output_h)
         
         for child in root.winfo_children():
             if isinstance(child, ctk.CTkButton):
                 child.configure(font=("Arial", new_size))
+
 
 root = ctk.CTk()
 root.title("Python CTk Calculator")
@@ -143,13 +149,14 @@ info_menu.add_command(
 
 root.config(menu=menubar)
 
+
 input_display = ctk.CTkEntry(
     root,
     placeholder_text="0",
     height=50,
     corner_radius=10,
     border_width=2,
-    font=("Arial", 18),
+    font=("Arial", 20),
     justify='right'
 )
 input_display.grid(
@@ -158,14 +165,14 @@ input_display.grid(
     columnspan=4, 
     sticky="nsew", 
     padx=10, 
-    pady=(10, 10)
+    pady=10
 )
 
 output_display= ctk.CTkLabel(
     root, 
     text="",
     height=40,
-    font=("Arial", 18), 
+    font=("Arial", 30), 
     anchor="e"
 )
 output_display.grid(
@@ -177,10 +184,11 @@ output_display.grid(
     pady=(0, 10)
 )
 
-btn_ac = create_btn("AC", button_all_delete, 2, 0, color="#E74C3C")
+
+btn_ac = create_btn("AC", lambda: button_all_delete(), 2, 0, color="#E74C3C")
 create_btn("^", lambda: button_click("^"), 2, 1, color="#5D6D7E")
 create_btn("÷", lambda: button_click("÷"), 2, 2, color="#5D6D7E")
-create_btn("←", button_delete, 2, 3, color="#5D6D7E")
+create_btn("←", lambda: button_delete(), 2, 3, color="#5D6D7E")
 
 create_btn("7", lambda: button_click(7), 3, 0)
 create_btn("8", lambda: button_click(8), 3, 1)
@@ -199,7 +207,7 @@ create_btn("+", lambda: button_click("+"), 5, 3, color="#3498DB")
 
 create_btn("0", lambda: button_click(0), 6, 0, colspan=2)
 create_btn(".", lambda: button_click("."), 6, 2)
-create_btn("=", button_result, 6, 3, color="#2ECC71")
+create_btn("=", lambda: button_result(), 6, 3, color="#2ECC71")
 
 for i in range(4):
     root.grid_columnconfigure(i, weight=1)
